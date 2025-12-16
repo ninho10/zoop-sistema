@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Cadastro de Produtos</h2>
+    <form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
+        <!-- Standard Fields -->
+        <div class="form-group">
+            <label>Foto</label>
+            <input type="file" name="photo" class="form-control-file" accept="image/*">
+        </div>
+        <div class="form-group">
+            <label>Nome</label>
+            <input type="text" name="name">
+        </div>
+        <div class="form-group">
+            <label>Descrição</label>
+            <textarea name="description"></textarea>
+        </div>
+        <div class="form-group">
+            <label>Fabricante</label>
+            <input type="text" name="manufacturer">
+        </div>
+        <div class="form-group">
+            <label>Região</label>
+            <input type="text" name="region">
+        </div>
+        <div class="form-group">
+            <label>Quantidade Mínima</label>
+            <input type="number" name="min_quantity">
+        </div>
+        <div class="form-group">
+            <label>Preço</label>
+            <input type="number" step="0.01" name="price">
+        </div>
+
+        <!-- Dynamic Fields -->
+        {% if extra_columns %}
+        <h3>Outras Informações</h3>
+        {% for col in extra_columns %}
+        <div class="form-group">
+            <label>{{ col }}</label>
+            <input type="text" name="{{ col }}">
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary">Salvar Produto</button>
+        <a href="{{ url_for('list_products') }}" class="btn btn-secondary">Ver Produtos</a>
+    </form>
+</div>
+{% endblock %}

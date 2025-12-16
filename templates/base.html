@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Zoop Produtos</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
+    <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
+    <meta name="theme-color" content="#333333">
+</head>
+
+<body>
+    <nav class="navbar">
+        <div class="brand">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Zoop Toys" style="height: 50px;">
+        </div>
+        <div class="links">
+            {% if session.get('user_id') %}
+            <a href="{{ url_for('list_products') }}">Produtos</a>
+            <a href="{{ url_for('add_product') }}">Cadastrar Produto</a>
+            {% if session.get('is_admin') %}
+            <a href="{{ url_for('manage_users') }}">Usuários</a>
+            {% endif %}
+            <a href="{{ url_for('logout') }}">Sair</a>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ category }}">{{ message }}</div>
+        {% endfor %}
+        {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
+                    .then(registration => {
+                        console.log('ServiceWorker registration successful');
+                    })
+                    .catch(err => {
+                        console.log('ServiceWorker registration failed: ', err);
+                    });
+            });
+        }
+    </script>
+</body>
+
+</html>
