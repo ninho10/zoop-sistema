@@ -100,5 +100,25 @@ def add_column(column_name, column_type="VARCHAR(255)"):
             conn.close()
     return False
 
+def delete_column(column_name):
+    """
+    Remove uma coluna da tabela de produtos.
+    """
+    conn = get_db_connection()
+    if conn:
+        cursor = conn.cursor()
+        try:
+            cursor.execute(f"ALTER TABLE products DROP COLUMN {column_name}")
+            conn.commit()
+            print(f"Coluna {column_name} removida com sucesso.")
+            return True
+        except Error as e:
+            print(f"Erro ao remover coluna: {e}")
+            return False
+        finally:
+            cursor.close()
+            conn.close()
+    return False
+
 if __name__ == "__main__":
     init_db()

@@ -1,6 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, session
 import mysql.connector
-from db import get_db_connection, add_column
+from db import get_db_connection, add_column, delete_column
 import sys
 import os
 from werkzeug.utils import secure_filename
@@ -88,6 +88,7 @@ def login():
                     # Define a sessão do usuário
                     session['user_id'] = user['id']
                     session['is_admin'] = user['is_admin']
+                    session['user_email'] = user['email']
                     return redirect(url_for('add_product'))
                 else:
                     flash('Seu cadastro ainda não foi aprovado.', 'warning')
@@ -97,6 +98,7 @@ def login():
                 if 'approved' in user and user['approved']:
                      session['user_id'] = user['id']
                      session['is_admin'] = user['is_admin']
+                     session['user_email'] = user['email']
                      return redirect(url_for('add_product'))
                 
         else:
@@ -259,6 +261,24 @@ def edit_product(id):
                 cursor.close()
                 conn.close()
                 return redirect(url_for('edit_product', id=id))
+
+                return redirect(url_for('edit_product', id=id))
+
+        # --- Lógica para excluir coluna ---
+        delete_col_name = request.form.get('delete_column_name')
+        if delete_col_name:
+             # Verifica permissão do usuário
+             if session.get('user_email') == 'desenvolvimentoti@semaxbrasil.com.br':
+                 if delete_column(delete_col_name):
+                     flash(f'Coluna "{delete_col_name}" excluída com sucesso!', 'success')
+                 else:
+                     flash(f'Erro ao excluir coluna "{delete_col_name}".', 'danger')
+             else:
+                 flash('Você não tem permissão para excluir colunas.', 'danger')
+             
+             cursor.close()
+             conn.close()
+             return redirect(url_for('edit_product', id=id))
 
         # --- Lógica de atualização do produto ---
         columns = get_product_columns()
