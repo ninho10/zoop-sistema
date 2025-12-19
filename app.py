@@ -166,7 +166,7 @@ def add_product():
             
             # Reconstruct logic to render template with error and preserve user input if possible (basic version here just re-renders)
             all_columns = get_product_columns()
-            standard_columns = ['id', 'photo', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price']
+            standard_columns = ['id', 'photo', 'photo2', 'photo3', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price', 'currency']
             extra_columns = [col for col in all_columns if col not in standard_columns]
             return render_template('add_product.html', extra_columns=extra_columns)
         
@@ -220,7 +220,7 @@ def add_product():
 
     # Separa colunas padrão das colunas extras para exibição no formulário
     all_columns = get_product_columns()
-    standard_columns = ['id', 'photo', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price']
+    standard_columns = ['id', 'photo', 'photo2', 'photo3', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price', 'currency']
     extra_columns = [col for col in all_columns if col not in standard_columns]
     
     return render_template('add_product.html', extra_columns=extra_columns)
@@ -354,7 +354,7 @@ def edit_product(id):
     conn.close()
     
     all_columns = get_product_columns()
-    standard_columns = ['id', 'photo', 'photo2', 'photo3', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price']
+    standard_columns = ['id', 'photo', 'photo2', 'photo3', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price', 'currency']
     extra_columns = [col for col in all_columns if col not in standard_columns]
     
     return render_template('edit_product.html', product=product, extra_columns=extra_columns)
@@ -379,7 +379,7 @@ def view_product(id):
         return redirect(url_for('list_products'))
     
     all_columns = get_product_columns()
-    standard_columns = ['id', 'photo', 'photo2', 'photo3', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price']
+    standard_columns = ['id', 'photo', 'photo2', 'photo3', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price', 'currency']
     extra_columns = [col for col in all_columns if col not in standard_columns]
     
     return render_template('view_product.html', product=product, extra_columns=extra_columns)

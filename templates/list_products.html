@@ -36,7 +36,14 @@
                     </td>
                     <td>{{ product.manufacturer }}</td>
                     <td>{{ product.region }}</td>
-                    <td>R$ {{ product.price }}</td>
+                    <td>
+                        {% if product.currency == 'Dolar' %}US$
+                        {% elif product.currency == 'Euro' %}€
+                        {% elif product.currency == 'Yuan' %}¥
+                        {% else %}R$
+                        {% endif %}
+                        {{ product.price }}
+                    </td>
                     <td>
                         <a href="{{ url_for('view_product', id=product.id) }}" class="btn btn-secondary"
                             style="background-color: var(--primary-blue); color: white;">Ver</a>

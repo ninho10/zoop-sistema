@@ -71,7 +71,15 @@
         </div>
         <div class="form-group">
             <label>Preço</label>
-            <input type="number" step="0.01" name="price" value="{{ product.price or '' }}">
+            <div style="display: flex; gap: 10px;">
+                <select name="currency" class="form-control" style="width: 100px;">
+                    <option value="Real" {% if product.currency=='Real' %}selected{% endif %}>R$</option>
+                    <option value="Dolar" {% if product.currency=='Dolar' %}selected{% endif %}>US$</option>
+                    <option value="Euro" {% if product.currency=='Euro' %}selected{% endif %}>€</option>
+                    <option value="Yuan" {% if product.currency=='Yuan' %}selected{% endif %}>¥</option>
+                </select>
+                <input type="number" step="0.01" name="price" value="{{ product.price or '' }}" style="flex: 1;">
+            </div>
         </div>
 
         <!-- Dynamic Fields -->

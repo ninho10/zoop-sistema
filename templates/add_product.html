@@ -31,7 +31,15 @@
         </div>
         <div class="form-group">
             <label>Preço</label>
-            <input type="number" step="0.01" name="price">
+            <div style="display: flex; gap: 10px;">
+                <select name="currency" class="form-control" style="width: 100px;">
+                    <option value="Real">R$</option>
+                    <option value="Dolar">US$</option>
+                    <option value="Euro">€</option>
+                    <option value="Yuan">¥</option>
+                </select>
+                <input type="number" step="0.01" name="price" style="flex: 1;">
+            </div>
         </div>
 
         <!-- Dynamic Fields -->

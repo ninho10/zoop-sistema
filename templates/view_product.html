@@ -53,7 +53,14 @@
                     </tr>
                     <tr>
                         <th>Preço</th>
-                        <td>R$ {{ product.price }}</td>
+                        <td>
+                            {% if product.currency == 'Dolar' %}US$
+                            {% elif product.currency == 'Euro' %}€
+                            {% elif product.currency == 'Yuan' %}¥
+                            {% else %}R$
+                            {% endif %}
+                            {{ product.price }}
+                        </td>
                     </tr>
                     <!-- Dynamic Fields -->
                     {% if extra_columns %}
