@@ -313,20 +313,21 @@ def edit_product(id):
                 else:
                     data_to_update[col] = value
         
-        # Gerenciamento de Upload de Imagem na Edição
-        if 'photo' in request.files:
-            file = request.files['photo']
-            if file and file.filename != '':
-                if allowed_file(file.filename):
-                    filename = secure_filename(file.filename)
-                    save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-                    try:
-                        file.save(save_path)
-                        data_to_update['photo'] = filename
-                    except Exception as e:
-                        flash(f'Erro ao salvar nova imagem: {e}', 'warning')
-                else:
-                    flash(f'Tipo de arquivo não permitido: {file.filename}', 'warning')
+        # Gerenciamento de Upload de Multiplas Imagens
+        for photo_field in ['photo', 'photo2', 'photo3']:
+            if photo_field in request.files:
+                file = request.files[photo_field]
+                if file and file.filename != '':
+                    if allowed_file(file.filename):
+                        filename = secure_filename(file.filename)
+                        save_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+                        try:
+                            file.save(save_path)
+                            data_to_update[photo_field] = filename
+                        except Exception as e:
+                            flash(f'Erro ao salvar imagem {photo_field}: {e}', 'warning')
+                    else:
+                        flash(f'Tipo de arquivo não permitido: {file.filename}', 'warning')
         
         if data_to_update:
             # Constrói query UPDATE dinâmica
@@ -353,7 +354,7 @@ def edit_product(id):
     conn.close()
     
     all_columns = get_product_columns()
-    standard_columns = ['id', 'photo', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price']
+    standard_columns = ['id', 'photo', 'photo2', 'photo3', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price']
     extra_columns = [col for col in all_columns if col not in standard_columns]
     
     return render_template('edit_product.html', product=product, extra_columns=extra_columns)
@@ -378,7 +379,7 @@ def view_product(id):
         return redirect(url_for('list_products'))
     
     all_columns = get_product_columns()
-    standard_columns = ['id', 'photo', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price']
+    standard_columns = ['id', 'photo', 'photo2', 'photo3', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price']
     extra_columns = [col for col in all_columns if col not in standard_columns]
     
     return render_template('view_product.html', product=product, extra_columns=extra_columns)

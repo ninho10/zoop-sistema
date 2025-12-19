@@ -6,7 +6,7 @@
     <form action="{{ url_for('edit_product', id=product.id) }}" method="POST" enctype="multipart/form-data">
         <!-- Standard Fields -->
         <div class="form-group">
-            <label>Foto</label>
+            <label>Foto Principal</label>
             {% if product.photo %}
             <div class="mb-2">
                 {% if product.photo.startswith('http') %}
@@ -18,6 +18,36 @@
             </div>
             {% endif %}
             <input type="file" name="photo" class="form-control-file" accept="image/*">
+        </div>
+
+        <div class="form-group">
+            <label>Foto 2 (Opcional)</label>
+            {% if product.photo2 %}
+            <div class="mb-2">
+                {% if product.photo2.startswith('http') %}
+                <img src="{{ product.photo2 }}" alt="Produto 2" style="max-height: 100px;">
+                {% else %}
+                <img src="{{ url_for('static', filename='uploads/' + product.photo2) }}" alt="Produto 2"
+                    style="max-height: 100px;">
+                {% endif %}
+            </div>
+            {% endif %}
+            <input type="file" name="photo2" class="form-control-file" accept="image/*">
+        </div>
+
+        <div class="form-group">
+            <label>Foto 3 (Opcional)</label>
+            {% if product.photo3 %}
+            <div class="mb-2">
+                {% if product.photo3.startswith('http') %}
+                <img src="{{ product.photo3 }}" alt="Produto 3" style="max-height: 100px;">
+                {% else %}
+                <img src="{{ url_for('static', filename='uploads/' + product.photo3) }}" alt="Produto 3"
+                    style="max-height: 100px;">
+                {% endif %}
+            </div>
+            {% endif %}
+            <input type="file" name="photo3" class="form-control-file" accept="image/*">
         </div>
         <div class="form-group">
             <label>Nome</label>
@@ -76,7 +106,8 @@
     <div class="dynamic-col-section mt-4" style="border-color: #dc3545;">
         <h3 class="text-danger">Excluir Coluna</h3>
         <p>ATENÇÃO: Isso removerá a coluna e todos os dados associados a ela PERMANENTEMENTE.</p>
-        <form action="{{ url_for('edit_product', id=product.id) }}" method="POST" onsubmit="return confirm('Tem certeza absoluta que deseja excluir esta coluna? Esta ação não pode ser desfeita.');">
+        <form action="{{ url_for('edit_product', id=product.id) }}" method="POST"
+            onsubmit="return confirm('Tem certeza absoluta que deseja excluir esta coluna? Esta ação não pode ser desfeita.');">
             <div class="form-group">
                 <label>Selecionar Coluna para Excluir</label>
                 <select name="delete_column_name" class="form-control">
