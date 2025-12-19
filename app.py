@@ -150,7 +150,25 @@ def add_product():
         # Prepara os dados para inserção, ignorando o ID (auto-incremento)
         for col in columns:
             if col != 'id' and col in form_data:
-                data_to_insert[col] = form_data[col]
+                value = form_data[col]
+                # Converte strings vazias ou apenas espaços para None (NULL no banco)
+                if isinstance(value, str):
+                     value = value.strip()
+                
+                if value == '':
+                    data_to_insert[col] = None
+                else:
+                    data_to_insert[col] = value
+        
+        # Backend validation: Name is mandatory
+        if not data_to_insert.get('name'):
+            flash('O nome do produto é obrigatório.', 'warning')
+            
+            # Reconstruct logic to render template with error and preserve user input if possible (basic version here just re-renders)
+            all_columns = get_product_columns()
+            standard_columns = ['id', 'photo', 'name', 'description', 'manufacturer', 'region', 'min_quantity', 'price']
+            extra_columns = [col for col in all_columns if col not in standard_columns]
+            return render_template('add_product.html', extra_columns=extra_columns)
         
         # Gerenciamento de Upload de Imagem
         print(f"DEPURAÇÃO: Verificando foto na requisição: {'photo' in request.files}")
@@ -285,7 +303,15 @@ def edit_product(id):
         data_to_update = {}
         for col in columns:
             if col != 'id' and col in form_data:
-                data_to_update[col] = form_data[col]
+                value = form_data[col]
+                
+                if isinstance(value, str):
+                    value = value.strip()
+                    
+                if value == '':
+                    data_to_update[col] = None
+                else:
+                    data_to_update[col] = value
         
         # Gerenciamento de Upload de Imagem na Edição
         if 'photo' in request.files:
