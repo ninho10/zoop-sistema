@@ -471,3 +471,13 @@ def delete_user(id):
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
+
+
+
+
+
+# --- ROTAS RODA NA CHINA ---
+
+@app.route("/")
+def home():
+    return "Site rápido na China 🚀"
