@@ -11,7 +11,7 @@ print(f"Usando mysql.connector: {mysql.connector.__version__}")
 
 
 app = Flask(__name__)
-app.secret_key = 'supersecretkey'  # Chave secreta para sessões
+app.secret_key = os.getenv('SECRET_KEY', 'supersecretkey')  # Chave secreta para sessões
 
 # --- CONFIGURAÇÃO DE UPLOAD DE ARQUIVOS ---
 UPLOAD_FOLDER = 'static/uploads'  # Pasta onde os arquivos serão salvos
@@ -476,8 +476,3 @@ if __name__ == '__main__':
 
 
 
-# --- ROTAS RODA NA CHINA ---
-
-@app.route("/")
-def home():
-    return "Site rápido na China 🚀"

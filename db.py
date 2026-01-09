@@ -1,12 +1,14 @@
 import mysql.connector
 from mysql.connector import Error
 
+import os
+
 # Configuração de Conexão com o Banco de Dados
 DB_CONFIG = {
-    'host': 'produtos_zoop.vpshost4282.mysql.dbaas.com.br',
-    'database': 'produtos_zoop',
-    'user': 'produtos_zoop',
-    'password': 'Zoop#@!123'
+    'host': os.getenv('DB_HOST', 'produtos_zoop.vpshost4282.mysql.dbaas.com.br'),
+    'database': os.getenv('DB_NAME', 'produtos_zoop'),
+    'user': os.getenv('DB_USER', 'produtos_zoop'),
+    'password': os.getenv('DB_PASSWORD', 'Zoop#@!123')
 }
 
 def get_db_connection():
