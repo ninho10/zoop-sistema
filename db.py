@@ -74,6 +74,16 @@ def init_db():
             cursor.execute(sql, val)
             print("Usuário administrador padrão criado.")
         
+        # Cria usuário William solicitado
+        cursor.execute("SELECT * FROM users WHERE email = 'e_william@cliostyle.com.br'")
+        william = cursor.fetchone()
+        if not william:
+             sql_william = """INSERT INTO users (name, company, ramal, email, password, is_approved, is_admin) 
+                      VALUES (%s, %s, %s, %s, %s, %s, %s)"""
+             val_william = ("William", "Clio", "0000", "e_william@cliostyle.com.br", "Clio#@!466", True, True)
+             cursor.execute(sql_william, val_william)
+             print("Usuário William criado.")
+        
         conn.commit()
         cursor.close()
         conn.close()
