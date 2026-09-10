@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Gerenciar Usuários</h2>
+    <div class="table-responsive">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Empresa</th>
+                    <th>Status</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td>{{ user.name }}</td>
+                    <td>{{ user.email }}</td>
+                    <td>{{ user.company }}</td>
+                    <td>
+                        {% if user.is_approved %}
+                        <span class="badge badge-success" style="color: green; font-weight: bold;">Aprovado</span>
+                        {% else %}
+                        <span class="badge badge-warning" style="color: orange; font-weight: bold;">Pendente</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if not user.is_approved %}
+                        <a href="{{ url_for('approve_user', id=user.id) }}" class="btn btn-primary btn-sm">Aprovar</a>
+                        {% endif %}
+
+                        {% if not user.is_admin %} <!-- Prevent deleting other admins or special checks if needed -->
+                        <a href="{{ url_for('delete_user', id=user.id) }}" class="btn btn-danger btn-sm"
+                            onclick="return confirm('Tem certeza que deseja excluir este usuário?')">Excluir</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

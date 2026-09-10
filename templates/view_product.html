@@ -1,0 +1,78 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: start;">
+        <h2>Detalhes do Produto</h2>
+        <div>
+            <a href="{{ url_for('edit_product', id=product.id) }}" class="btn btn-primary">Editar</a>
+            <a href="{{ url_for('list_products') }}" class="btn btn-secondary">Voltar</a>
+        </div>
+    </div>
+
+    <div style="margin-top: 2rem;">
+        <div style="margin-top: 2rem;">
+            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
+                {% for photo_field in ['photo', 'photo2', 'photo3'] %}
+                {% if product[photo_field] %}
+                <div style="text-align: center;">
+                    {% if product[photo_field].startswith('http') %}
+                    <img src="{{ product[photo_field] }}" alt="{{ product.name }}"
+                        style="max-height: 300px; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    {% else %}
+                    <img src="{{ url_for('static', filename='uploads/' + product[photo_field]) }}"
+                        alt="{{ product.name }}"
+                        style="max-height: 300px; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                    {% endif %}
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+
+            <table class="table" style="max-width: 800px; margin: 0 auto;">
+                <tbody>
+                    <tr>
+                        <th style="width: 200px;">Nome</th>
+                        <td>{{ product.name }}</td>
+                    </tr>
+                    <tr>
+                        <th>Descrição</th>
+                        <td>{{ product.description }}</td>
+                    </tr>
+                    <tr>
+                        <th>Fabricante</th>
+                        <td>{{ product.manufacturer }}</td>
+                    </tr>
+                    <tr>
+                        <th>Região</th>
+                        <td>{{ product.region }}</td>
+                    </tr>
+                    <tr>
+                        <th>Quantidade Mínima</th>
+                        <td>{{ product.min_quantity }}</td>
+                    </tr>
+                    <tr>
+                        <th>Preço</th>
+                        <td>
+                            {% if product.currency == 'Dolar' %}US$
+                            {% elif product.currency == 'Euro' %}€
+                            {% elif product.currency == 'Yuan' %}¥
+                            {% else %}R$
+                            {% endif %}
+                            {{ product.price }}
+                        </td>
+                    </tr>
+                    <!-- Dynamic Fields -->
+                    {% if extra_columns %}
+                    {% for col in extra_columns %}
+                    <tr>
+                        <th style="text-transform: capitalize;">{{ col }}</th>
+                        <td>{{ product[col] }}</td>
+                    </tr>
+                    {% endfor %}
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {% endblock %}

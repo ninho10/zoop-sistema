@@ -1,0 +1,198 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <h2>Editar Produto</h2>
+    <form action="{{ url_for('edit_product', id=product.id) }}" method="POST" enctype="multipart/form-data">
+        <!-- Standard Fields -->
+        <div class="form-group">
+            <label>Fotos do Produto (Até 3 imagens)</label>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 10px;">
+                <!-- Foto 1 -->
+                <div class="photo-upload-box" onclick="document.getElementById('photo1').click()">
+                    <div class="upload-label">
+                        <span class="upload-icon">📷</span>
+                        <span style="font-size: 0.8rem; font-weight: 500;">Principal</span>
+                    </div>
+                    <input type="file" name="photo" id="photo1" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview1')">
+                    {% set photo1_url = '#' %}
+                    {% set photo1_display = 'none' %}
+                    {% if product.photo %}
+                        {% set photo1_display = 'block' %}
+                        {% if product.photo.startswith('http') %}
+                            {% set photo1_url = product.photo %}
+                        {% else %}
+                            {% set photo1_url = url_for('static', filename='uploads/' + product.photo) %}
+                        {% endif %}
+                    {% endif %}
+                    <img id="preview1" src="{{ photo1_url }}" alt="Preview" style="display: {{ photo1_display }}; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; z-index: 2;">
+                </div>
+                
+                <!-- Foto 2 -->
+                <div class="photo-upload-box" onclick="document.getElementById('photo2').click()">
+                    <div class="upload-label">
+                        <span class="upload-icon">📷</span>
+                        <span style="font-size: 0.8rem; font-weight: 500;">Foto 2</span>
+                    </div>
+                    <input type="file" name="photo2" id="photo2" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview2')">
+                    {% set photo2_url = '#' %}
+                    {% set photo2_display = 'none' %}
+                    {% if product.photo2 %}
+                        {% set photo2_display = 'block' %}
+                        {% if product.photo2.startswith('http') %}
+                            {% set photo2_url = product.photo2 %}
+                        {% else %}
+                            {% set photo2_url = url_for('static', filename='uploads/' + product.photo2) %}
+                        {% endif %}
+                    {% endif %}
+                    <img id="preview2" src="{{ photo2_url }}" alt="Preview" style="display: {{ photo2_display }}; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; z-index: 2;">
+                </div>
+                
+                <!-- Foto 3 -->
+                <div class="photo-upload-box" onclick="document.getElementById('photo3').click()">
+                    <div class="upload-label">
+                        <span class="upload-icon">📷</span>
+                        <span style="font-size: 0.8rem; font-weight: 500;">Foto 3</span>
+                    </div>
+                    <input type="file" name="photo3" id="photo3" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview3')">
+                    {% set photo3_url = '#' %}
+                    {% set photo3_display = 'none' %}
+                    {% if product.photo3 %}
+                        {% set photo3_display = 'block' %}
+                        {% if product.photo3.startswith('http') %}
+                            {% set photo3_url = product.photo3 %}
+                        {% else %}
+                            {% set photo3_url = url_for('static', filename='uploads/' + product.photo3) %}
+                        {% endif %}
+                    {% endif %}
+                    <img id="preview3" src="{{ photo3_url }}" alt="Preview" style="display: {{ photo3_display }}; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; z-index: 2;">
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function previewImage(input, previewId) {
+                var preview = document.getElementById(previewId);
+                if (input.files && input.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        preview.src = e.target.result;
+                        preview.style.display = 'block';
+                    }
+                    reader.readAsDataURL(input.files[0]);
+                }
+            }
+        </script>
+        
+        <style>
+            .photo-upload-box {
+                position: relative;
+                border: 2px dashed #dcdfe6;
+                border-radius: var(--radius-md);
+                background-color: #f8fafc;
+                height: 120px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all var(--transition-normal);
+                overflow: hidden;
+                cursor: pointer;
+            }
+            .photo-upload-box:hover {
+                border-color: var(--primary-blue);
+                background-color: #f0f7ff;
+            }
+            .upload-label {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                color: var(--text-muted);
+                justify-content: center;
+            }
+            .upload-icon {
+                font-size: 1.5rem;
+                margin-bottom: 5px;
+                opacity: 0.7;
+            }
+        </style>
+        <div class="form-group">
+            <label>Nome</label>
+            <input type="text" name="name" value="{{ product.name or '' }}">
+        </div>
+        <div class="form-group">
+            <label>Descrição</label>
+            <textarea name="description">{{ product.description or '' }}</textarea>
+        </div>
+        <div class="form-group">
+            <label>Fabricante</label>
+            <input type="text" name="manufacturer" value="{{ product.manufacturer or '' }}">
+        </div>
+        <div class="form-group">
+            <label>Região</label>
+            <input type="text" name="region" value="{{ product.region or '' }}">
+        </div>
+        <div class="form-group">
+            <label>Quantidade Mínima</label>
+            <input type="number" name="min_quantity" value="{{ product.min_quantity or '' }}">
+        </div>
+        <div class="form-group">
+            <label>Preço</label>
+            <div style="display: flex; gap: 10px;">
+                <select name="currency" class="form-control" style="width: 100px;">
+                    <option value="Real" {% if product.currency=='Real' %}selected{% endif %}>R$</option>
+                    <option value="Dolar" {% if product.currency=='Dolar' %}selected{% endif %}>US$</option>
+                    <option value="Euro" {% if product.currency=='Euro' %}selected{% endif %}>€</option>
+                    <option value="Yuan" {% if product.currency=='Yuan' %}selected{% endif %}>¥</option>
+                </select>
+                <input type="number" step="0.01" name="price" value="{{ product.price or '' }}" style="flex: 1;">
+            </div>
+        </div>
+
+        <!-- Dynamic Fields -->
+        {% if extra_columns %}
+        <h3>Outras Informações</h3>
+        {% for col in extra_columns %}
+        <div class="form-group">
+            <label>{{ col }}</label>
+            <input type="text" name="{{ col }}" value="{{ product[col] or '' }}">
+        </div>
+        {% endfor %}
+        {% endif %}
+
+        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
+        <a href="{{ url_for('list_products') }}" class="btn btn-secondary">Cancelar</a>
+    </form>
+
+    <div class="dynamic-col-section">
+        <h3>Adicionar Nova Coluna</h3>
+        <p>Crie um novo campo para todos os produtos.</p>
+        <form action="{{ url_for('edit_product', id=product.id) }}" method="POST">
+            <div class="form-group">
+                <label>Nome da Nova Coluna</label>
+                <input type="text" name="new_column_name" placeholder="Ex: Cor, Tamanho, Peso">
+            </div>
+            <button type="submit" class="btn btn-warning" style="background-color: var(--primary-yellow);">Criar
+                Coluna</button>
+        </form>
+    </div>
+
+    {% if session['user_email'] == 'desenvolvimentoti@semaxbrasil.com.br' and extra_columns %}
+    <div class="dynamic-col-section mt-4" style="border-color: #dc3545;">
+        <h3 class="text-danger">Excluir Coluna</h3>
+        <p>ATENÇÃO: Isso removerá a coluna e todos os dados associados a ela PERMANENTEMENTE.</p>
+        <form action="{{ url_for('edit_product', id=product.id) }}" method="POST"
+            onsubmit="return confirm('Tem certeza absoluta que deseja excluir esta coluna? Esta ação não pode ser desfeita.');">
+            <div class="form-group">
+                <label>Selecionar Coluna para Excluir</label>
+                <select name="delete_column_name" class="form-control">
+                    {% for col in extra_columns %}
+                    <option value="{{ col }}">{{ col }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button type="submit" class="btn btn-danger">Excluir Coluna</button>
+        </form>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
