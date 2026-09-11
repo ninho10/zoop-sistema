@@ -1,78 +1,187 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card">
-    <div style="display: flex; justify-content: space-between; align-items: start;">
-        <h2>Detalhes do Produto</h2>
-        <div>
-            <a href="{{ url_for('edit_product', id=product.id) }}" class="btn btn-primary">Editar</a>
-            <a href="{{ url_for('list_products') }}" class="btn btn-secondary">Voltar</a>
-        </div>
+<div class="table-header" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+        <a href="{{ url_for('list_products') }}" style="color: var(--primary-blue); text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px; font-weight: 500;">
+            <i class="ri-arrow-left-line"></i> Voltar para a lista
+        </a>
+        <h2 style="margin: 0; border: none; padding: 0;">Detalhes do produto</h2>
+        <p style="color: var(--text-muted); margin: 5px 0 0; font-size: 0.9rem;">Visualizando as informações do produto.</p>
     </div>
+    
+    <div style="display: flex; gap: 10px;">
+        <a href="{{ url_for('edit_product', id=product.id) }}" class="btn btn-primary">
+            <i class="ri-pencil-line"></i> Editar produto
+        </a>
+    </div>
+</div>
 
-    <div style="margin-top: 2rem;">
-        <div style="margin-top: 2rem;">
-            <div style="display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; margin-bottom: 2rem;">
-                {% for photo_field in ['photo', 'photo2', 'photo3'] %}
-                {% if product[photo_field] %}
-                <div style="text-align: center;">
-                    {% if product[photo_field].startswith('http') %}
-                    <img src="{{ product[photo_field] }}" alt="{{ product.name }}"
-                        style="max-height: 300px; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+<div class="form-row">
+    <!-- Left Column: Images & Meta Info -->
+    <div class="form-col" style="flex: 1;">
+        <div class="card" style="margin-bottom: 1.5rem; text-align: center; padding: 1.5rem;">
+            <!-- Main Image -->
+            <div style="width: 100%; height: 250px; background-color: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 15px; overflow: hidden;">
+                {% set photo1_url = '#' %}
+                {% set photo1_display = 'none' %}
+                {% if product.photo %}
+                    {% set photo1_display = 'block' %}
+                    {% if product.photo.startswith('http') %}
+                        {% set photo1_url = product.photo %}
                     {% else %}
-                    <img src="{{ url_for('static', filename='uploads/' + product[photo_field]) }}"
-                        alt="{{ product.name }}"
-                        style="max-height: 300px; max-width: 100%; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        {% set photo1_url = url_for('static', filename='uploads/' + product.photo) %}
+                    {% endif %}
+                {% endif %}
+                <img src="{{ photo1_url }}" alt="Produto" style="display: {{ photo1_display }}; width: 100%; height: 100%; object-fit: contain; z-index: 2;">
+                {% if not product.photo %}
+                <i class="ri-image-line" style="font-size: 3rem; color: var(--text-muted); opacity: 0.5;"></i>
+                {% endif %}
+            </div>
+            
+            <!-- Thumbnails -->
+            <div style="display: flex; gap: 10px; justify-content: center;">
+                <!-- Thumb 2 -->
+                <div style="width: 60px; height: 60px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; position: relative; background-color: #f8fafc; display: flex; align-items: center; justify-content: center;">
+                    {% set photo2_url = '#' %}
+                    {% set photo2_display = 'none' %}
+                    {% if product.photo2 %}
+                        {% set photo2_display = 'block' %}
+                        {% if product.photo2.startswith('http') %}
+                            {% set photo2_url = product.photo2 %}
+                        {% else %}
+                            {% set photo2_url = url_for('static', filename='uploads/' + product.photo2) %}
+                        {% endif %}
+                    {% endif %}
+                    <img src="{{ photo2_url }}" alt="Foto 2" style="display: {{ photo2_display }}; width: 100%; height: 100%; object-fit: cover; z-index: 2;">
+                    {% if not product.photo2 %}
+                    <i class="ri-image-line" style="color: var(--text-muted); opacity: 0.5;"></i>
                     {% endif %}
                 </div>
-                {% endif %}
-                {% endfor %}
+                
+                <!-- Thumb 3 -->
+                <div style="width: 60px; height: 60px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; position: relative; background-color: #f8fafc; display: flex; align-items: center; justify-content: center;">
+                    {% set photo3_url = '#' %}
+                    {% set photo3_display = 'none' %}
+                    {% if product.photo3 %}
+                        {% set photo3_display = 'block' %}
+                        {% if product.photo3.startswith('http') %}
+                            {% set photo3_url = product.photo3 %}
+                        {% else %}
+                            {% set photo3_url = url_for('static', filename='uploads/' + product.photo3) %}
+                        {% endif %}
+                    {% endif %}
+                    <img src="{{ photo3_url }}" alt="Foto 3" style="display: {{ photo3_display }}; width: 100%; height: 100%; object-fit: cover; z-index: 2;">
+                    {% if not product.photo3 %}
+                    <i class="ri-image-line" style="color: var(--text-muted); opacity: 0.5;"></i>
+                    {% endif %}
+                </div>
             </div>
-
-            <table class="table" style="max-width: 800px; margin: 0 auto;">
-                <tbody>
-                    <tr>
-                        <th style="width: 200px;">Nome</th>
-                        <td>{{ product.name }}</td>
-                    </tr>
-                    <tr>
-                        <th>Descrição</th>
-                        <td>{{ product.description }}</td>
-                    </tr>
-                    <tr>
-                        <th>Fabricante</th>
-                        <td>{{ product.manufacturer }}</td>
-                    </tr>
-                    <tr>
-                        <th>Região</th>
-                        <td>{{ product.region }}</td>
-                    </tr>
-                    <tr>
-                        <th>Quantidade Mínima</th>
-                        <td>{{ product.min_quantity }}</td>
-                    </tr>
-                    <tr>
-                        <th>Preço</th>
-                        <td>
+        </div>
+        
+        <div class="card">
+            <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dark);">Informações</h3>
+            
+            <table style="width: 100%; font-size: 0.9rem; color: var(--text-muted);">
+                <tr>
+                    <td style="padding-bottom: 10px;">ID do produto</td>
+                    <td style="padding-bottom: 10px; font-weight: 500; color: var(--text-dark); text-align: right;">#{{ product.id }}</td>
+                </tr>
+                <tr>
+                    <td style="padding-bottom: 10px;">Status</td>
+                    <td style="padding-bottom: 10px; text-align: right;"><span class="status-badge">Ativo</span></td>
+                </tr>
+            </table>
+        </div>
+    </div>
+    
+    <!-- Right Column: Details -->
+    <div class="form-col" style="flex: 2;">
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dark);">Informações do produto</h3>
+            
+            <div class="form-group">
+                <label>Nome do produto</label>
+                <div style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background-color: #f8fafc;">
+                    {{ product.name or '-' }}
+                </div>
+            </div>
+            
+            <div class="form-row" style="margin-bottom: 0;">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label>Fabricante</label>
+                        <div style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background-color: #f8fafc;">
+                            {{ product.manufacturer or '-' }}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label>Região</label>
+                        <div style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background-color: #f8fafc;">
+                            {{ product.region or '-' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="form-group">
+                <label>Descrição</label>
+                <div style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background-color: #f8fafc; min-height: 80px;">
+                    {{ product.description or '-' }}
+                </div>
+            </div>
+        </div>
+        
+        <div class="card" style="margin-bottom: 1.5rem;">
+            <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dark);">Dados comerciais</h3>
+            
+            <div class="form-row" style="margin-bottom: 0;">
+                <div class="form-col">
+                    <div class="form-group">
+                        <label>Quantidade mínima</label>
+                        <div style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background-color: #f8fafc;">
+                            {{ product.min_quantity or '0' }}
+                        </div>
+                    </div>
+                </div>
+                <div class="form-col">
+                    <div class="form-group">
+                        <label>Preço</label>
+                        <div style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background-color: #f8fafc;">
                             {% if product.currency == 'Dolar' %}US$
                             {% elif product.currency == 'Euro' %}€
                             {% elif product.currency == 'Yuan' %}¥
                             {% else %}R$
                             {% endif %}
-                            {{ product.price }}
-                        </td>
-                    </tr>
-                    <!-- Dynamic Fields -->
-                    {% if extra_columns %}
-                    {% for col in extra_columns %}
-                    <tr>
-                        <th style="text-transform: capitalize;">{{ col }}</th>
-                        <td>{{ product[col] }}</td>
-                    </tr>
-                    {% endfor %}
-                    {% endif %}
-                </tbody>
-            </table>
+                            {{ product.price or '0.00' }}
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
+        
+        <!-- Campos Extras -->
+        {% if extra_columns %}
+        <div class="card">
+            <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dark);">Campos adicionais</h3>
+            
+            <div class="form-row" style="flex-wrap: wrap; margin-bottom: 0;">
+                {% for col in extra_columns %}
+                <div class="form-col" style="min-width: 30%;">
+                    <div class="form-group">
+                        <label>{{ col }}</label>
+                        <div style="padding: 0.75rem 1rem; border: 1px solid var(--border-color); border-radius: var(--radius-sm); background-color: #f8fafc;">
+                            {{ product[col] or '-' }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endif %}
+
     </div>
-    {% endblock %}
+</div>
+{% endblock %}

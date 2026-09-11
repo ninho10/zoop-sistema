@@ -8,47 +8,118 @@
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="manifest" href="{{ url_for('static', filename='manifest.json') }}">
     <link rel="apple-touch-icon" href="{{ url_for('static', filename='logo.png') }}">
-    <meta name="theme-color" content="#333333">
+    <meta name="theme-color" content="#0A429B">
+    <!-- Icon Font for icons (via Alibaba/ElemeCDN para carregamento otimizado na China) -->
+    <link href="https://npm.elemecdn.com/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
 </head>
 
 <body>
-    <nav class="navbar">
-        <div class="brand">
-            <img src="{{ url_for('static', filename='logo.png') }}" alt="Zoop Toys" style="height: 50px;">
-        </div>
-        <div class="links">
-            {% if session.get('user_id') %}
-            <a href="{{ url_for('list_products') }}">Produtos</a>
-            <a href="{{ url_for('add_product') }}">Cadastrar Produto</a>
-            {% if session.get('is_admin') %}
-            <a href="{{ url_for('manage_users') }}">Usuários</a>
-            {% endif %}
-            <a href="{{ url_for('logout') }}">Sair</a>
-            {% endif %}
-        </div>
-    </nav>
+    {% block layout %}
+    <div class="dashboard-layout">
+        <!-- Top Header -->
+        <header class="top-header">
+            <div class="brand">
+                <i class="ri-menu-line menu-toggle" onclick="toggleSidebar()"></i>
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Zoop Toys">
+                <span class="brand-text">Cadastro de Produtos</span>
+            </div>
+            <div class="user-profile">
+                <div class="notification">
+                    <i class="ri-notification-3-line" style="font-size: 1.2rem;"></i>
+                </div>
+                <div class="user-info">
+                    <div class="avatar"><i class="ri-user-line"></i></div>
+                    <span class="user-email">
+                    {% if session.get('user_email') %}
+                        {{ session.get('user_email') }}
+                    {% else %}
+                        Usuário
+                    {% endif %}
+                    </span>
+                    <i class="ri-arrow-down-s-line"></i>
+                </div>
+            </div>
+        </header>
 
-    <div class="container">
-        {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }}">{{ message }}</div>
-        {% endfor %}
-        {% endif %}
-        {% endwith %}
+        <div class="dashboard-body">
+            <!-- Overlay for Mobile Sidebar -->
+            <div class="sidebar-overlay" onclick="toggleSidebar()"></div>
+            
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="sidebar-nav">
+                    <a href="{{ url_for('list_products') }}" class="{% if request.endpoint == 'list_products' %}active{% endif %}">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="ri-store-2-line"></i>
+                            <span class="nav-text">Produtos</span>
+                        </div>
+                    </a>
+                    <a href="{{ url_for('add_product') }}" class="{% if request.endpoint == 'add_product' %}active{% endif %}">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="ri-add-circle-line"></i>
+                            <span class="nav-text">Cadastrar produto</span>
+                        </div>
+                    </a>
+                    {% if session.get('is_admin') %}
+                    <a href="{{ url_for('manage_users') }}" class="{% if request.endpoint == 'manage_users' %}active{% endif %}">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="ri-group-line"></i>
+                            <span class="nav-text">Usuários</span>
+                        </div>
+                    </a>
+                    {% endif %}
+                    <a href="#" style="display: none;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="ri-checkbox-circle-line"></i>
+                            <span class="nav-text">Aprovações</span>
+                        </div>
+                        <span class="badge">3</span>
+                    </a>
+                    <a href="#" style="display: none;">
+                        <div style="display:flex; align-items:center; gap:10px;">
+                            <i class="ri-menu-add-line"></i>
+                            <span class="nav-text">Campos adicionais</span>
+                        </div>
+                    </a>
+                </nav>
+                <div class="sidebar-bottom">
+                    <a href="{{ url_for('logout') }}">
+                        <i class="ri-logout-box-line"></i>
+                        <span class="nav-text">Sair</span>
+                    </a>
+                </div>
+            </aside>
 
-        {% block content %}{% endblock %}
+            <!-- Main Content -->
+            <main class="main-content">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                {% for category, message in messages %}
+                <div class="alert alert-{{ category }}">
+                    <i class="ri-information-line" style="margin-right: 8px;"></i>
+                    {{ message }}
+                </div>
+                {% endfor %}
+                {% endif %}
+                {% endwith %}
+
+                {% block content %}{% endblock %}
+            </main>
+        </div>
     </div>
+    {% endblock %}
+
     <script>
+        function toggleSidebar() {
+            document.querySelector('.sidebar').classList.toggle('active');
+            document.querySelector('.sidebar-overlay').classList.toggle('active');
+        }
+
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register("{{ url_for('static', filename='service-worker.js') }}")
-                    .then(registration => {
-                        console.log('ServiceWorker registration successful');
-                    })
-                    .catch(err => {
-                        console.log('ServiceWorker registration failed: ', err);
-                    });
+                    .then(registration => console.log('SW registered'))
+                    .catch(err => console.log('SW failed', err));
             });
         }
     </script>

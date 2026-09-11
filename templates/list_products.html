@@ -1,64 +1,111 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card">
-    <h2>Lista de Produtos</h2>
+<div class="table-header">
+    <div>
+        <h2 style="margin: 0; border: none; padding: 0;">Produtos</h2>
+        <p style="color: var(--text-muted); margin: 5px 0 0; font-size: 0.9rem;">Gerencie todos os produtos cadastrados no sistema.</p>
+    </div>
+    <a href="{{ url_for('add_product') }}" class="btn btn-primary">
+        <i class="ri-add-line"></i> Cadastrar produto
+    </a>
+</div>
 
-    <form action="{{ url_for('list_products') }}" method="GET" class="form-group">
-        <input type="text" name="q" placeholder="Pesquisar por nome, região ou descrição...">
-        <button type="submit" class="btn btn-primary" style="margin-top: 0.5rem;">Pesquisar</button>
+<div class="card">
+    <form action="{{ url_for('list_products') }}" method="GET">
+        <div class="filters-bar">
+            <div class="search-input">
+                <i class="ri-search-line" style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted);"></i>
+                <input type="text" name="q" placeholder="Buscar por nome, fabricante, região..." value="{{ request.args.get('q', '') }}">
+            </div>
+            <select class="filter-select">
+                <option>Todos os fabricantes</option>
+            </select>
+            <select class="filter-select">
+                <option>Todas as regiões</option>
+            </select>
+            <select class="filter-select">
+                <option>Todos os status</option>
+            </select>
+            <button type="submit" class="btn btn-outline" style="display: flex; gap: 8px;">
+                <i class="ri-filter-3-line"></i> Filtros
+            </button>
+        </div>
     </form>
 
     <div class="table-responsive">
         <table class="table">
             <thead>
                 <tr>
-                    <th>Nome</th>
+                    <th style="width: 40px;"><input type="checkbox"></th>
+                    <th>Imagem</th>
+                    <th>Nome do produto</th>
                     <th>Fabricante</th>
                     <th>Região</th>
                     <th>Preço</th>
-                    <th>Ações</th>
+                    <th>Status</th>
+                    <th style="text-align: right;">Ações</th>
                 </tr>
             </thead>
             <tbody>
                 {% for product in products %}
                 <tr>
+                    <td><input type="checkbox"></td>
                     <td>
                         {% if product.photo %}
                         {% if product.photo.startswith('http') %}
-                        <img src="{{ product.photo }}" alt="Foto" style="max-height: 50px; margin-right: 10px;">
+                        <img src="{{ product.photo }}" alt="Foto" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);">
                         {% else %}
-                        <img src="{{ url_for('static', filename='uploads/' + product.photo) }}" alt="Foto"
-                            style="max-height: 50px; margin-right: 10px;">
+                        <img src="{{ url_for('static', filename='uploads/' + product.photo) }}" alt="Foto" style="width: 40px; height: 40px; object-fit: cover; border-radius: 4px; border: 1px solid var(--border-color);">
                         {% endif %}
+                        {% else %}
+                        <div style="width: 40px; height: 40px; border-radius: 4px; background-color: #e2e8f0; display: flex; align-items: center; justify-content: center; color: #94a3b8;">
+                            <i class="ri-image-line"></i>
+                        </div>
                         {% endif %}
-                        {{ product.name }}
                     </td>
-                    <td>{{ product.manufacturer }}</td>
-                    <td>{{ product.region }}</td>
+                    <td style="font-weight: 500;">{{ product.name }}</td>
+                    <td>{{ product.manufacturer or '-' }}</td>
+                    <td>{{ product.region or '-' }}</td>
                     <td>
                         {% if product.currency == 'Dolar' %}US$
                         {% elif product.currency == 'Euro' %}€
                         {% elif product.currency == 'Yuan' %}¥
                         {% else %}R$
                         {% endif %}
-                        {{ product.price }}
+                        {{ product.price or '0.00' }}
                     </td>
-                    <td>
-                        <a href="{{ url_for('view_product', id=product.id) }}" class="btn btn-secondary"
-                            style="background-color: var(--primary-blue); color: white;">Ver</a>
-                        <a href="{{ url_for('edit_product', id=product.id) }}" class="btn btn-secondary">Editar</a>
-                        <a href="{{ url_for('delete_product', id=product.id) }}" class="btn btn-danger"
-                            onclick="return confirm('Tem certeza?')">Excluir</a>
+                    <td><span class="status-badge">Ativo</span></td>
+                    <td style="text-align: right;">
+                        <div style="display: flex; justify-content: flex-end; gap: 8px;">
+                            <a href="{{ url_for('view_product', id=product.id) }}" class="btn-action">
+                                <i class="ri-eye-line"></i> Visualizar
+                            </a>
+                            <a href="{{ url_for('edit_product', id=product.id) }}" class="btn-action">
+                                <i class="ri-pencil-line"></i> Editar
+                            </a>
+                        </div>
                     </td>
                 </tr>
                 {% else %}
                 <tr>
-                    <td colspan="5">Nenhum produto encontrado.</td>
+                    <td colspan="8" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                        <i class="ri-inbox-archive-line" style="font-size: 2rem; margin-bottom: 10px; display: block;"></i>
+                        Nenhum produto encontrado.
+                    </td>
                 </tr>
                 {% endfor %}
             </tbody>
         </table>
+    </div>
+    
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5rem; color: var(--text-muted); font-size: 0.9rem;">
+        <span>Mostrando {{ products|length }} produtos</span>
+        <div style="display: flex; gap: 5px;">
+            <button class="btn-action" style="padding: 4px 8px;" disabled><i class="ri-arrow-left-s-line"></i></button>
+            <button class="btn-primary" style="padding: 4px 12px; border: none; border-radius: 4px;">1</button>
+            <button class="btn-action" style="padding: 4px 8px;" disabled><i class="ri-arrow-right-s-line"></i></button>
+        </div>
     </div>
 </div>
 {% endblock %}

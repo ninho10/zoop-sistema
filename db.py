@@ -1,6 +1,5 @@
 import mysql.connector
-from mysql.connector import Error
-
+from mysql.connector import Error, pooling
 import os
 
 # Configuração de Conexão com o Banco de Dados
@@ -11,17 +10,32 @@ DB_CONFIG = {
     'password': os.getenv('DB_PASSWORD', 'Zoop#@!123')
 }
 
+# Cria um pool de conexões para evitar lentidão
+try:
+    connection_pool = pooling.MySQLConnectionPool(
+        pool_name="zoop_pool",
+        pool_size=5,
+        pool_reset_session=True,
+        connect_timeout=10,
+        **DB_CONFIG
+    )
+except Error as e:
+    print(f"Erro ao inicializar o pool de conexões: {e}")
+    connection_pool = None
+
 def get_db_connection():
     """
-    Estabelece uma conexão com o banco de dados MySQL usando as configurações do DB_CONFIG.
-    Retorna o objeto de conexão se bem-sucedido, ou None se falhar.
+    Estabelece uma conexão com o banco de dados MySQL usando o pool de conexões.
     """
+    if not connection_pool:
+        return None
+        
     try:
-        connection = mysql.connector.connect(**DB_CONFIG)
+        connection = connection_pool.get_connection()
         if connection.is_connected():
             return connection
     except Error as e:
-        print(f"Erro ao conectar ao MySQL: {e}")
+        print(f"Erro ao pegar conexão do pool: {e}")
         return None
 
 def init_db():

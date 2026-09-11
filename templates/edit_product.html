@@ -1,20 +1,32 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card">
-    <h2>Editar Produto</h2>
-    <form action="{{ url_for('edit_product', id=product.id) }}" method="POST" enctype="multipart/form-data">
-        <!-- Standard Fields -->
-        <div class="form-group">
-            <label>Fotos do Produto (Até 3 imagens)</label>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 10px;">
-                <!-- Foto 1 -->
-                <div class="photo-upload-box" onclick="document.getElementById('photo1').click()">
-                    <div class="upload-label">
-                        <span class="upload-icon">📷</span>
-                        <span style="font-size: 0.8rem; font-weight: 500;">Principal</span>
-                    </div>
-                    <input type="file" name="photo" id="photo1" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview1')">
+<div class="table-header" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: flex-end;">
+    <div>
+        <a href="{{ url_for('list_products') }}" style="color: var(--primary-blue); text-decoration: none; font-size: 0.9rem; display: inline-flex; align-items: center; gap: 5px; margin-bottom: 10px; font-weight: 500;">
+            <i class="ri-arrow-left-line"></i> Voltar para a lista
+        </a>
+        <h2 style="margin: 0; border: none; padding: 0;">Detalhes do produto</h2>
+        <p style="color: var(--text-muted); margin: 5px 0 0; font-size: 0.9rem;">Visualize e edite as informações do produto.</p>
+    </div>
+    
+    <div style="display: flex; gap: 10px;">
+        <a href="{{ url_for('delete_product', id=product.id) }}" class="btn btn-danger" onclick="return confirm('Tem certeza absoluta que deseja excluir este produto?');">
+            <i class="ri-delete-bin-line"></i> Excluir produto
+        </a>
+        <button type="submit" form="editForm" class="btn btn-primary">
+            <i class="ri-save-line"></i> Salvar alterações
+        </button>
+    </div>
+</div>
+
+<form id="editForm" action="{{ url_for('edit_product', id=product.id) }}" method="POST" enctype="multipart/form-data">
+    <div class="form-row">
+        <!-- Left Column: Images & Meta Info -->
+        <div class="form-col" style="flex: 1;">
+            <div class="card" style="margin-bottom: 1.5rem; text-align: center; padding: 1.5rem;">
+                <!-- Main Image -->
+                <div style="width: 100%; height: 250px; background-color: #f8fafc; border-radius: var(--radius-md); border: 1px solid var(--border-color); display: flex; align-items: center; justify-content: center; position: relative; margin-bottom: 15px; overflow: hidden; cursor: pointer;" onclick="document.getElementById('photo1').click()">
                     {% set photo1_url = '#' %}
                     {% set photo1_display = 'none' %}
                     {% if product.photo %}
@@ -25,174 +37,222 @@
                             {% set photo1_url = url_for('static', filename='uploads/' + product.photo) %}
                         {% endif %}
                     {% endif %}
-                    <img id="preview1" src="{{ photo1_url }}" alt="Preview" style="display: {{ photo1_display }}; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; z-index: 2;">
+                    <img id="preview1" src="{{ photo1_url }}" alt="Produto" style="display: {{ photo1_display }}; width: 100%; height: 100%; object-fit: contain; z-index: 2;">
+                    {% if not product.photo %}
+                    <i class="ri-image-line" style="font-size: 3rem; color: var(--text-muted); opacity: 0.5;"></i>
+                    <p style="position: absolute; bottom: 20px; font-size: 0.8rem; color: var(--text-muted);">Clique para alterar foto principal</p>
+                    {% endif %}
+                    <input type="file" name="photo" id="photo1" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview1')">
                 </div>
                 
-                <!-- Foto 2 -->
-                <div class="photo-upload-box" onclick="document.getElementById('photo2').click()">
-                    <div class="upload-label">
-                        <span class="upload-icon">📷</span>
-                        <span style="font-size: 0.8rem; font-weight: 500;">Foto 2</span>
-                    </div>
-                    <input type="file" name="photo2" id="photo2" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview2')">
-                    {% set photo2_url = '#' %}
-                    {% set photo2_display = 'none' %}
-                    {% if product.photo2 %}
-                        {% set photo2_display = 'block' %}
-                        {% if product.photo2.startswith('http') %}
-                            {% set photo2_url = product.photo2 %}
-                        {% else %}
-                            {% set photo2_url = url_for('static', filename='uploads/' + product.photo2) %}
+                <!-- Thumbnails -->
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <!-- Thumb 2 -->
+                    <div style="width: 60px; height: 60px; border: 1px solid var(--primary-blue); border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; position: relative; background-color: #f8fafc; display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('photo2').click()">
+                        {% set photo2_url = '#' %}
+                        {% set photo2_display = 'none' %}
+                        {% if product.photo2 %}
+                            {% set photo2_display = 'block' %}
+                            {% if product.photo2.startswith('http') %}
+                                {% set photo2_url = product.photo2 %}
+                            {% else %}
+                                {% set photo2_url = url_for('static', filename='uploads/' + product.photo2) %}
+                            {% endif %}
                         {% endif %}
-                    {% endif %}
-                    <img id="preview2" src="{{ photo2_url }}" alt="Preview" style="display: {{ photo2_display }}; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; z-index: 2;">
-                </div>
-                
-                <!-- Foto 3 -->
-                <div class="photo-upload-box" onclick="document.getElementById('photo3').click()">
-                    <div class="upload-label">
-                        <span class="upload-icon">📷</span>
-                        <span style="font-size: 0.8rem; font-weight: 500;">Foto 3</span>
-                    </div>
-                    <input type="file" name="photo3" id="photo3" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview3')">
-                    {% set photo3_url = '#' %}
-                    {% set photo3_display = 'none' %}
-                    {% if product.photo3 %}
-                        {% set photo3_display = 'block' %}
-                        {% if product.photo3.startswith('http') %}
-                            {% set photo3_url = product.photo3 %}
-                        {% else %}
-                            {% set photo3_url = url_for('static', filename='uploads/' + product.photo3) %}
+                        <img id="preview2" src="{{ photo2_url }}" alt="Foto 2" style="display: {{ photo2_display }}; width: 100%; height: 100%; object-fit: cover; z-index: 2;">
+                        {% if not product.photo2 %}
+                        <i class="ri-add-line" style="color: var(--text-muted);"></i>
                         {% endif %}
-                    {% endif %}
-                    <img id="preview3" src="{{ photo3_url }}" alt="Preview" style="display: {{ photo3_display }}; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; z-index: 2;">
+                        <input type="file" name="photo2" id="photo2" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview2')">
+                    </div>
+                    
+                    <!-- Thumb 3 -->
+                    <div style="width: 60px; height: 60px; border: 1px solid var(--border-color); border-radius: var(--radius-sm); overflow: hidden; cursor: pointer; position: relative; background-color: #f8fafc; display: flex; align-items: center; justify-content: center;" onclick="document.getElementById('photo3').click()">
+                        {% set photo3_url = '#' %}
+                        {% set photo3_display = 'none' %}
+                        {% if product.photo3 %}
+                            {% set photo3_display = 'block' %}
+                            {% if product.photo3.startswith('http') %}
+                                {% set photo3_url = product.photo3 %}
+                            {% else %}
+                                {% set photo3_url = url_for('static', filename='uploads/' + product.photo3) %}
+                            {% endif %}
+                        {% endif %}
+                        <img id="preview3" src="{{ photo3_url }}" alt="Foto 3" style="display: {{ photo3_display }}; width: 100%; height: 100%; object-fit: cover; z-index: 2;">
+                        {% if not product.photo3 %}
+                        <i class="ri-add-line" style="color: var(--text-muted);"></i>
+                        {% endif %}
+                        <input type="file" name="photo3" id="photo3" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview3')">
+                    </div>
                 </div>
             </div>
+            
+            <div class="card">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dark);">Informações</h3>
+                
+                <table style="width: 100%; font-size: 0.9rem; color: var(--text-muted);">
+                    <tr>
+                        <td style="padding-bottom: 10px;">ID do produto</td>
+                        <td style="padding-bottom: 10px; font-weight: 500; color: var(--text-dark); text-align: right;">#{{ product.id }}</td>
+                    </tr>
+                    <tr>
+                        <td style="padding-bottom: 10px;">Status</td>
+                        <td style="padding-bottom: 10px; text-align: right;"><span class="status-badge">Ativo</span></td>
+                    </tr>
+                </table>
+            </div>
         </div>
-
-        <script>
-            function previewImage(input, previewId) {
-                var preview = document.getElementById(previewId);
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
-                    }
-                    reader.readAsDataURL(input.files[0]);
-                }
-            }
-        </script>
         
-        <style>
-            .photo-upload-box {
-                position: relative;
-                border: 2px dashed #dcdfe6;
-                border-radius: var(--radius-md);
-                background-color: #f8fafc;
-                height: 120px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all var(--transition-normal);
-                overflow: hidden;
-                cursor: pointer;
-            }
-            .photo-upload-box:hover {
-                border-color: var(--primary-blue);
-                background-color: #f0f7ff;
-            }
-            .upload-label {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                color: var(--text-muted);
-                justify-content: center;
-            }
-            .upload-icon {
-                font-size: 1.5rem;
-                margin-bottom: 5px;
-                opacity: 0.7;
-            }
-        </style>
-        <div class="form-group">
-            <label>Nome</label>
-            <input type="text" name="name" value="{{ product.name or '' }}">
-        </div>
-        <div class="form-group">
-            <label>Descrição</label>
-            <textarea name="description">{{ product.description or '' }}</textarea>
-        </div>
-        <div class="form-group">
-            <label>Fabricante</label>
-            <input type="text" name="manufacturer" value="{{ product.manufacturer or '' }}">
-        </div>
-        <div class="form-group">
-            <label>Região</label>
-            <input type="text" name="region" value="{{ product.region or '' }}">
-        </div>
-        <div class="form-group">
-            <label>Quantidade Mínima</label>
-            <input type="number" name="min_quantity" value="{{ product.min_quantity or '' }}">
-        </div>
-        <div class="form-group">
-            <label>Preço</label>
-            <div style="display: flex; gap: 10px;">
-                <select name="currency" class="form-control" style="width: 100px;">
-                    <option value="Real" {% if product.currency=='Real' %}selected{% endif %}>R$</option>
-                    <option value="Dolar" {% if product.currency=='Dolar' %}selected{% endif %}>US$</option>
-                    <option value="Euro" {% if product.currency=='Euro' %}selected{% endif %}>€</option>
-                    <option value="Yuan" {% if product.currency=='Yuan' %}selected{% endif %}>¥</option>
-                </select>
-                <input type="number" step="0.01" name="price" value="{{ product.price or '' }}" style="flex: 1;">
+        <!-- Right Column: Forms -->
+        <div class="form-col" style="flex: 2;">
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dark);">Informações do produto</h3>
+                
+                <div class="form-group">
+                    <label>Nome do produto <span style="color: var(--primary-red);">*</span></label>
+                    <input type="text" name="name" value="{{ product.name or '' }}" required>
+                </div>
+                
+                <div class="form-row" style="margin-bottom: 0;">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Fabricante <span style="color: var(--primary-red);">*</span></label>
+                            <select name="manufacturer">
+                                <option value="" disabled>Selecione o fabricante</option>
+                                <option value="Dell" {% if product.manufacturer == 'Dell' %}selected{% endif %}>Dell</option>
+                                <option value="Samsung" {% if product.manufacturer == 'Samsung' %}selected{% endif %}>Samsung</option>
+                                <option value="LG" {% if product.manufacturer == 'LG' %}selected{% endif %}>LG</option>
+                                <option value="Logitech" {% if product.manufacturer == 'Logitech' %}selected{% endif %}>Logitech</option>
+                                <option value="{{ product.manufacturer }}" {% if product.manufacturer not in ['Dell', 'Samsung', 'LG', 'Logitech'] and product.manufacturer %}selected{% endif %}>{{ product.manufacturer or 'Outro' }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Região <span style="color: var(--primary-red);">*</span></label>
+                            <select name="region">
+                                <option value="" disabled>Selecione a região</option>
+                                <option value="Sudeste" {% if product.region == 'Sudeste' %}selected{% endif %}>Sudeste</option>
+                                <option value="Sul" {% if product.region == 'Sul' %}selected{% endif %}>Sul</option>
+                                <option value="Nordeste" {% if product.region == 'Nordeste' %}selected{% endif %}>Nordeste</option>
+                                <option value="Centro-Oeste" {% if product.region == 'Centro-Oeste' %}selected{% endif %}>Centro-Oeste</option>
+                                <option value="Norte" {% if product.region == 'Norte' %}selected{% endif %}>Norte</option>
+                                <option value="{{ product.region }}" {% if product.region not in ['Sudeste', 'Sul', 'Nordeste', 'Centro-Oeste', 'Norte'] and product.region %}selected{% endif %}>{{ product.region }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Descrição <span style="color: var(--primary-red);">*</span></label>
+                    <textarea name="description" rows="3">{{ product.description or '' }}</textarea>
+                </div>
             </div>
-        </div>
-
-        <!-- Dynamic Fields -->
-        {% if extra_columns %}
-        <h3>Outras Informações</h3>
-        {% for col in extra_columns %}
-        <div class="form-group">
-            <label>{{ col }}</label>
-            <input type="text" name="{{ col }}" value="{{ product[col] or '' }}">
-        </div>
-        {% endfor %}
-        {% endif %}
-
-        <button type="submit" class="btn btn-primary">Salvar Alterações</button>
-        <a href="{{ url_for('list_products') }}" class="btn btn-secondary">Cancelar</a>
-    </form>
-
-    <div class="dynamic-col-section">
-        <h3>Adicionar Nova Coluna</h3>
-        <p>Crie um novo campo para todos os produtos.</p>
-        <form action="{{ url_for('edit_product', id=product.id) }}" method="POST">
-            <div class="form-group">
-                <label>Nome da Nova Coluna</label>
-                <input type="text" name="new_column_name" placeholder="Ex: Cor, Tamanho, Peso">
+            
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dark);">Dados comerciais</h3>
+                
+                <div class="form-row" style="margin-bottom: 0;">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Quantidade mínima <span style="color: var(--primary-red);">*</span></label>
+                            <input type="number" name="min_quantity" value="{{ product.min_quantity or '' }}">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Preço <span style="color: var(--primary-red);">*</span></label>
+                            <input type="number" step="0.01" name="price" value="{{ product.price or '' }}">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Moeda <span style="color: var(--primary-red);">*</span></label>
+                            <select name="currency">
+                                <option value="Real" {% if product.currency=='Real' %}selected{% endif %}>Real (R$)</option>
+                                <option value="Dolar" {% if product.currency=='Dolar' %}selected{% endif %}>Dólar (US$)</option>
+                                <option value="Euro" {% if product.currency=='Euro' %}selected{% endif %}>Euro (€)</option>
+                                <option value="Yuan" {% if product.currency=='Yuan' %}selected{% endif %}>Yuan (¥)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
             </div>
-            <button type="submit" class="btn btn-warning" style="background-color: var(--primary-yellow);">Criar
-                Coluna</button>
-        </form>
-    </div>
-
-    {% if session['user_email'] == 'desenvolvimentoti@semaxbrasil.com.br' and extra_columns %}
-    <div class="dynamic-col-section mt-4" style="border-color: #dc3545;">
-        <h3 class="text-danger">Excluir Coluna</h3>
-        <p>ATENÇÃO: Isso removerá a coluna e todos os dados associados a ela PERMANENTEMENTE.</p>
-        <form action="{{ url_for('edit_product', id=product.id) }}" method="POST"
-            onsubmit="return confirm('Tem certeza absoluta que deseja excluir esta coluna? Esta ação não pode ser desfeita.');">
-            <div class="form-group">
-                <label>Selecionar Coluna para Excluir</label>
-                <select name="delete_column_name" class="form-control">
+            
+            <!-- Campos Extras -->
+            {% if extra_columns %}
+            <div class="card">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dark);">Campos adicionais</h3>
+                
+                <div class="form-row" style="flex-wrap: wrap; margin-bottom: 0;">
                     {% for col in extra_columns %}
-                    <option value="{{ col }}">{{ col }}</option>
+                    <div class="form-col" style="min-width: 30%;">
+                        <div class="form-group">
+                            <label>{{ col }}</label>
+                            <input type="text" name="{{ col }}" value="{{ product[col] or '' }}">
+                        </div>
+                    </div>
                     {% endfor %}
-                </select>
+                </div>
             </div>
-            <button type="submit" class="btn btn-danger">Excluir Coluna</button>
-        </form>
+            {% endif %}
+            
+            <div class="card" style="background-color: #f8fafc; border-style: dashed;">
+                <h4 style="margin-top: 0; margin-bottom: 1rem; color: var(--primary-blue);">Gestão de Colunas Dinâmicas</h4>
+                <div class="form-row" style="margin-bottom: 0; align-items: flex-end;">
+                    <div class="form-col">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label>Criar Nova Coluna</label>
+                            <input type="text" name="new_column_name" placeholder="Ex: Tamanho" form="colForm">
+                        </div>
+                    </div>
+                    <div class="form-col" style="flex: 0 0 auto;">
+                        <button type="submit" form="colForm" class="btn btn-primary" style="background-color: var(--primary-yellow); color: var(--text-dark);">Criar Coluna</button>
+                    </div>
+                </div>
+                
+                {% if session['user_email'] == 'desenvolvimentoti@semaxbrasil.com.br' and extra_columns %}
+                <hr style="margin: 1.5rem 0; border: 0; border-top: 1px dashed var(--border-color);">
+                <div class="form-row" style="margin-bottom: 0; align-items: flex-end;">
+                    <div class="form-col">
+                        <div class="form-group" style="margin-bottom: 0;">
+                            <label style="color: var(--primary-red);">Excluir Coluna Permanentemente</label>
+                            <select name="delete_column_name" form="delColForm">
+                                <option value="" disabled selected>Selecionar Coluna</option>
+                                {% for col in extra_columns %}
+                                <option value="{{ col }}">{{ col }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col" style="flex: 0 0 auto;">
+                        <button type="submit" form="delColForm" class="btn btn-danger" onclick="return confirm('ATENÇÃO: Isso removerá a coluna e os dados associados a ela PERMANENTEMENTE para todos os produtos. Tem certeza?');">Excluir</button>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+
+        </div>
     </div>
-    {% endif %}
-</div>
+</form>
+
+<!-- Hidden forms for dynamic column operations to separate from main form -->
+<form id="colForm" action="{{ url_for('edit_product', id=product.id) }}" method="POST" style="display: none;"></form>
+{% if session['user_email'] == 'desenvolvimentoti@semaxbrasil.com.br' and extra_columns %}
+<form id="delColForm" action="{{ url_for('edit_product', id=product.id) }}" method="POST" style="display: none;"></form>
+{% endif %}
+
+<script>
+    function previewImage(input, previewId) {
+        var preview = document.getElementById(previewId);
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 {% endblock %}

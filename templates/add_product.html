@@ -1,131 +1,174 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<div class="card">
-    <h2>Cadastro de Produtos</h2>
-    <form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
-        <!-- Standard Fields -->
-        <div class="form-group">
-            <label>Fotos do Produto (Até 3 imagens)</label>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 15px; margin-top: 10px;">
-                <div class="photo-upload-box" onclick="document.getElementById('photo1').click()">
-                    <div class="upload-label">
-                        <span class="upload-icon">📷</span>
-                        <span style="font-size: 0.8rem; font-weight: 500;">Principal</span>
-                    </div>
-                    <input type="file" name="photo" id="photo1" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview1')">
-                    <img id="preview1" src="#" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; z-index: 2;">
-                </div>
-                <div class="photo-upload-box" onclick="document.getElementById('photo2').click()">
-                    <div class="upload-label">
-                        <span class="upload-icon">📷</span>
-                        <span style="font-size: 0.8rem; font-weight: 500;">Foto 2</span>
-                    </div>
-                    <input type="file" name="photo2" id="photo2" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview2')">
-                    <img id="preview2" src="#" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; z-index: 2;">
-                </div>
-                <div class="photo-upload-box" onclick="document.getElementById('photo3').click()">
-                    <div class="upload-label">
-                        <span class="upload-icon">📷</span>
-                        <span style="font-size: 0.8rem; font-weight: 500;">Foto 3</span>
-                    </div>
-                    <input type="file" name="photo3" id="photo3" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview3')">
-                    <img id="preview3" src="#" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: 8px; position: absolute; top: 0; left: 0; z-index: 2;">
-                </div>
-            </div>
-        </div>
-
-        <script>
-            function previewImage(input, previewId) {
-                var preview = document.getElementById(previewId);
-                if (input.files && input.files[0]) {
-                    var reader = new FileReader();
-                    reader.onload = function(e) {
-                        preview.src = e.target.result;
-                        preview.style.display = 'block';
-                    }
-                    reader.readAsDataURL(input.files[0]);
-                }
-            }
-        </script>
-        
-        <style>
-            .photo-upload-box {
-                position: relative;
-                border: 2px dashed #dcdfe6;
-                border-radius: var(--radius-md);
-                background-color: #f8fafc;
-                height: 120px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                transition: all var(--transition-normal);
-                overflow: hidden;
-                cursor: pointer;
-            }
-            .photo-upload-box:hover {
-                border-color: var(--primary-blue);
-                background-color: #f0f7ff;
-            }
-            .upload-label {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                color: var(--text-muted);
-                justify-content: center;
-            }
-            .upload-icon {
-                font-size: 1.5rem;
-                margin-bottom: 5px;
-                opacity: 0.7;
-            }
-        </style>
-        <div class="form-group">
-            <label>Nome</label>
-            <input type="text" name="name" required>
-        </div>
-        <div class="form-group">
-            <label>Descrição</label>
-            <textarea name="description"></textarea>
-        </div>
-        <div class="form-group">
-            <label>Fabricante</label>
-            <input type="text" name="manufacturer">
-        </div>
-        <div class="form-group">
-            <label>Região</label>
-            <input type="text" name="region">
-        </div>
-        <div class="form-group">
-            <label>Quantidade Mínima</label>
-            <input type="number" name="min_quantity">
-        </div>
-        <div class="form-group">
-            <label>Preço</label>
-            <div style="display: flex; gap: 10px;">
-                <select name="currency" class="form-control" style="width: 100px;">
-                    <option value="Real">R$</option>
-                    <option value="Dolar">US$</option>
-                    <option value="Euro">€</option>
-                    <option value="Yuan">¥</option>
-                </select>
-                <input type="number" step="0.01" name="price" style="flex: 1;">
-            </div>
-        </div>
-
-        <!-- Dynamic Fields -->
-        {% if extra_columns %}
-        <h3>Outras Informações</h3>
-        {% for col in extra_columns %}
-        <div class="form-group">
-            <label>{{ col }}</label>
-            <input type="text" name="{{ col }}">
-        </div>
-        {% endfor %}
-        {% endif %}
-
-        <button type="submit" class="btn btn-primary">Salvar Produto</button>
-        <a href="{{ url_for('list_products') }}" class="btn btn-secondary">Ver Produtos</a>
-    </form>
+<div class="table-header" style="margin-bottom: 0.5rem;">
+    <div>
+        <h2 style="margin: 0; border: none; padding: 0;">Cadastrar produto</h2>
+        <p style="color: var(--text-muted); margin: 5px 0 0; font-size: 0.9rem;">Preencha as informações do produto para incluí-lo no sistema.</p>
+    </div>
 </div>
+
+<form action="{{ url_for('add_product') }}" method="POST" enctype="multipart/form-data">
+    <div class="form-row">
+        <!-- Left Column -->
+        <div class="form-col" style="flex: 1.5;">
+            <div class="card" style="height: 100%;">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dark);">Informações básicas</h3>
+                
+                <div class="form-group">
+                    <label>Nome do produto <span style="color: var(--primary-red);">*</span></label>
+                    <input type="text" name="name" placeholder="Ex: Notebook Dell Inspiron" required>
+                </div>
+                
+                <div class="form-group">
+                    <label>Descrição <span style="color: var(--primary-red);">*</span></label>
+                    <textarea name="description" rows="4" placeholder="Descreva as principais características do produto..."></textarea>
+                </div>
+                
+                <div class="form-row" style="margin-bottom: 0;">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Fabricante <span style="color: var(--primary-red);">*</span></label>
+                            <select name="manufacturer">
+                                <option value="" disabled selected>Selecione o fabricante</option>
+                                <option value="Dell">Dell</option>
+                                <option value="Samsung">Samsung</option>
+                                <option value="LG">LG</option>
+                                <option value="Logitech">Logitech</option>
+                                <option value="Outro">Outro</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Região <span style="color: var(--primary-red);">*</span></label>
+                            <select name="region">
+                                <option value="" disabled selected>Selecione a região</option>
+                                <option value="Sudeste">Sudeste</option>
+                                <option value="Sul">Sul</option>
+                                <option value="Nordeste">Nordeste</option>
+                                <option value="Centro-Oeste">Centro-Oeste</option>
+                                <option value="Norte">Norte</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                
+                {% if extra_columns %}
+                <hr style="border: 0; border-top: 1px solid var(--border-color); margin: 2rem 0;">
+                <h3 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1rem; color: var(--text-dark);">Campos adicionais</h3>
+                <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1.5rem;">Preencha os campos extras definidos pelo administrador.</p>
+                
+                <div class="form-row" style="flex-wrap: wrap;">
+                    {% for col in extra_columns %}
+                    <div class="form-col" style="min-width: 30%;">
+                        <div class="form-group">
+                            <label>{{ col }}</label>
+                            <input type="text" name="{{ col }}" placeholder="Digite {{ col|lower }}...">
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        
+        <!-- Right Column -->
+        <div class="form-col" style="flex: 1;">
+            <div class="card" style="margin-bottom: 1.5rem;">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dark);">Dados comerciais</h3>
+                
+                <div class="form-row">
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Quantidade mínima <span style="color: var(--primary-red);">*</span></label>
+                            <input type="number" name="min_quantity" placeholder="Ex: 10">
+                        </div>
+                    </div>
+                    <div class="form-col">
+                        <div class="form-group">
+                            <label>Preço <span style="color: var(--primary-red);">*</span></label>
+                            <input type="number" step="0.01" name="price" placeholder="Ex: 2499,00">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="form-group">
+                    <label>Moeda <span style="color: var(--primary-red);">*</span></label>
+                    <select name="currency">
+                        <option value="Real" selected>Real (R$)</option>
+                        <option value="Dolar">Dólar (US$)</option>
+                        <option value="Euro">Euro (€)</option>
+                        <option value="Yuan">Yuan (¥)</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3 style="margin-top: 0; margin-bottom: 1.5rem; font-size: 1.1rem; color: var(--text-dark);">Imagem do produto</h3>
+                
+                <div class="photo-upload-container" onclick="document.getElementById('photo1').click()" style="margin-bottom: 1rem;">
+                    <i class="ri-cloud-upload-line" style="font-size: 2.5rem; color: var(--primary-blue);"></i>
+                    <p style="font-weight: 500; margin: 10px 0 5px; color: var(--primary-blue);">Arraste e solte uma imagem aqui</p>
+                    <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px;">ou clique para selecionar a foto principal</p>
+                    <p style="color: #94a3b8; font-size: 0.8rem;">Formatos aceitos: PNG, JPG, JPEG, GIF, WEBP</p>
+                    <input type="file" name="photo" id="photo1" accept="image/*" style="display: none;" onchange="previewMainImage(this)">
+                    <img id="main-preview" src="#" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover; border-radius: var(--radius-md); position: absolute; top: 0; left: 0; z-index: 2; background: white;">
+                </div>
+                
+                <label style="display: block; margin-bottom: 0.5rem; font-weight: 500; color: var(--text-dark); font-size: 0.9rem;">Fotos secundárias (Opcionais)</label>
+                <div style="display: flex; gap: 10px;">
+                    <!-- Foto 2 -->
+                    <div style="flex: 1; height: 80px; border: 2px dashed var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; background-color: #f8fafc;" onclick="document.getElementById('photo2').click()">
+                        <i class="ri-image-add-line" style="color: var(--text-muted); font-size: 1.5rem;"></i>
+                        <input type="file" name="photo2" id="photo2" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview2')">
+                        <img id="preview2" src="#" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 2;">
+                    </div>
+                    <!-- Foto 3 -->
+                    <div style="flex: 1; height: 80px; border: 2px dashed var(--border-color); border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center; cursor: pointer; position: relative; overflow: hidden; background-color: #f8fafc;" onclick="document.getElementById('photo3').click()">
+                        <i class="ri-image-add-line" style="color: var(--text-muted); font-size: 1.5rem;"></i>
+                        <input type="file" name="photo3" id="photo3" accept="image/*" style="display: none;" onchange="previewImage(this, 'preview3')">
+                        <img id="preview3" src="#" alt="Preview" style="display: none; width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 2;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1rem; margin-bottom: 3rem;">
+        <a href="{{ url_for('list_products') }}" class="btn btn-outline">Cancelar</a>
+        <button type="submit" class="btn btn-primary"><i class="ri-save-line"></i> Salvar produto</button>
+    </div>
+</form>
+
+<script>
+    function previewMainImage(input) {
+        var container = input.parentElement;
+        var preview = document.getElementById('main-preview');
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+                // Remove content inside visually by making it relative and setting z-index
+                container.style.position = 'relative';
+                container.style.overflow = 'hidden';
+                container.style.padding = '0';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+
+    function previewImage(input, previewId) {
+        var preview = document.getElementById(previewId);
+        if (input.files && input.files[0]) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                preview.src = e.target.result;
+                preview.style.display = 'block';
+            }
+            reader.readAsDataURL(input.files[0]);
+        }
+    }
+</script>
 {% endblock %}
